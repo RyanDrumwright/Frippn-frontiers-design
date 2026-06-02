@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRIPPN Frontiers — The Field</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --off-black: #111;
+    --orange: #E8510A;
+    --warm-white: #F5F0E8;
+    --muted: #666;
+    --muted-light: #999;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(232,81,10,0.3);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--warm-white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+    cursor: default;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* HEADER */
+  header {
+    padding: 24px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,10,0.94);
+    backdrop-filter: blur(16px);
+    z-index: 100;
+  }
+
+  .wordmark {
+    font-family: 'Abril Fatface', serif;
+    font-size: 17px;
+    letter-spacing: 0.05em;
+    color: var(--warm-white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .wordmark-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--orange);
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .header-nav a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .header-nav a:hover { color: var(--warm-white); }
+
+  .subscribe-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--orange) !important;
+    border: 1px solid rgba(232,81,10,0.3);
+    padding: 7px 14px;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s !important;
+  }
+
+  .subscribe-btn:hover {
+    background: var(--orange) !important;
+    color: #fff !important;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 72px 48px 56px;
+    border-bottom: 1px solid var(--border);
+    max-width: 900px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.1s;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-eyebrow::after {
+    content: '';
+    flex: 1;
+    max-width: 40px;
+    height: 1px;
+    background: var(--orange);
+    opacity: 0.4;
+  }
+
+  h1 {
+    font-family: 'Abril Fatface', serif;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 1.0;
+    color: var(--warm-white);
+    margin-bottom: 20px;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+    color: var(--muted-light);
+    max-width: 520px;
+    line-height: 1.75;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    min-height: calc(100vh - 73px);
+  }
+
+  /* BATCHES */
+  .batches {
+    border-right: 1px solid var(--border);
+    padding: 0;
+  }
+
+  /* BATCH */
+  .batch {
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .batch:nth-child(1) { animation-delay: 0.2s; }
+  .batch:nth-child(2) { animation-delay: 0.35s; }
+  .batch:nth-child(3) { animation-delay: 0.5s; }
+
+  .batch-header {
+    padding: 36px 48px 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .batch-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .batch-issue {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+  }
+
+  .batch-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .batch-title {
+    font-family: 'Abril Fatface', serif;
+    font-size: 22px;
+    color: var(--warm-white);
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .batch-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+
+  /* ROLE CARDS */
+  .roles-list {
+    padding: 0 48px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .role-card {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .role-card:hover {
+    border-color: rgba(232,81,10,0.2);
+  }
+
+  .role-card.expanded {
+    border-color: rgba(232,81,10,0.35);
+  }
+
+  .role-trigger {
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+    cursor: pointer;
+    background: rgba(255,255,255,0.02);
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .role-trigger:hover {
+    background: rgba(255,255,255,0.04);
+  }
+
+  .role-card.expanded .role-trigger {
+    background: rgba(232,81,10,0.05);
+  }
+
+  .role-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .role-company {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+  }
+
+  .role-title {
+    font-size: 16px;
+    color: var(--warm-white);
+    font-weight: 400;
+  }
+
+  .role-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--muted-light);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 3px 8px;
+  }
+
+  .role-arrow {
+    font-size: 14px;
+    color: var(--muted);
+    transition: transform 0.3s, color 0.2s;
+    flex-shrink: 0;
+  }
+
+  .role-card.expanded .role-arrow {
+    transform: rotate(90deg);
+    color: var(--orange);
+  }
+
+  /* EXPANDED CONTENT */
+  .role-expanded {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .role-card.expanded .role-expanded {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .role-jd {
+    padding: 28px 24px;
+    border-right: 1px solid var(--border);
+  }
+
+  .jd-pitch {
+    font-size: 14px;
+    color: #bbb;
+    line-height: 1.75;
+    margin-bottom: 20px;
+  }
+
+  .jd-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .jd-bullets li {
+    font-size: 13px;
+    color: #999;
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .jd-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--orange);
+    font-size: 11px;
+  }
+
+  .comp-line {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--orange);
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+
+  /* INLINE FORM */
+  .role-form {
+    padding: 28px 24px;
+    background: rgba(232,81,10,0.03);
+  }
+
+  .form-heading {
+    font-family: 'Abril Fatface', serif;
+    font-size: 16px;
+    color: var(--warm-white);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  .form-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 18px;
+    line-height: 1.5;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .field {
+    margin-bottom: 10px;
+  }
+
+  .field label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .field input, .field textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 9px 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--warm-white);
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .field input::placeholder, .field textarea::placeholder {
+    color: #333;
+  }
+
+  .field input:focus, .field textarea:focus {
+    border-color: rgba(232,81,10,0.4);
+  }
+
+  .field textarea {
+    resize: none;
+    height: 60px;
+    font-size: 12px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    margin-top: 6px;
+    padding: 11px;
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .submit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .submit-btn:active { transform: none; }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .form-fine {
+    margin-top: 10px;
+    font-size: 10px;
+    color: #444;
+    font-family: 'DM Mono', monospace;
+    line-height: 1.5;
+  }
+
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 24px 0;
+  }
+
+  .form-success.show { display: block; }
+
+  .success-mark {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: var(--orange);
+  }
+
+  .form-success h4 {
+    font-family: 'Abril Fatface', serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--warm-white);
+    margin-bottom: 6px;
+  }
+
+  .form-success p {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.6;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    padding: 40px 28px;
+    position: sticky;
+    top: 73px;
+    height: fit-content;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.4s;
+  }
+
+  .sidebar-block {
+    margin-bottom: 40px;
+  }
+
+  .sidebar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .sidebar-block p {
+    font-size: 13px;
+    color: var(--muted-light);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .sidebar-block p strong {
+    color: var(--warm-white);
+    font-weight: 400;
+  }
+
+  .cta-link {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--orange);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(232,81,10,0.3);
+    padding-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+
+  .cta-link:hover { border-color: var(--orange); }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  .sub-form input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--warm-white);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 8px;
+    -webkit-appearance: none;
+  }
+
+  .sub-form input::placeholder { color: #333; }
+  .sub-form input:focus { border-color: rgba(232,81,10,0.4); }
+
+  .sub-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: var(--orange);
+    border: 1px solid rgba(232,81,10,0.4);
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .sub-btn:hover { background: var(--orange); color: #fff; }
+
+  .archive-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .archive-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    transition: padding-left 0.2s;
+  }
+
+  .archive-item:hover { padding-left: 4px; }
+
+  .archive-item-title {
+    font-size: 12px;
+    color: var(--muted-light);
+    transition: color 0.2s;
+  }
+
+  .archive-item:hover .archive-item-title { color: var(--warm-white); }
+
+  .archive-item-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 0.05em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .batch, .role-card { transform: translateY(12px); }
+
+  /* MOBILE */
+  @media (max-width: 900px) {
+    header { padding: 18px 24px; }
+    .header-nav { gap: 16px; }
+    .hero { padding: 48px 24px 40px; }
+    .main { grid-template-columns: 1fr; }
+    .batches { border-right: none; }
+    .batch-header { padding: 28px 24px 20px; }
+    .roles-list { padding: 0 24px 28px; }
+    .role-card.expanded .role-expanded { grid-template-columns: 1fr; }
+    .role-jd { border-right: none; border-bottom: 1px solid var(--border); }
+    .sidebar { display: none; }
+    footer { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#" class="wordmark">
+    <span class="wordmark-dot"></span>
+    FRIPPN FRONTIERS
+  </a>
+  <nav class="header-nav">
+    <a href="#batches">The Field</a>
+    <a href="#about">About</a>
+    <a href="mailto:ryan@frippn.com" class="subscribe-btn">Work with Ryan</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">/// The Field</div>
+  <h1>Roles worth<br>your attention.</h1>
+  <p class="hero-desc">Hand-picked weekly. No ATS. No pile of applications. Register interest and Ryan reaches out directly to have a real conversation.</p>
+</div>
+
+<div class="main" id="batches">
+
+  <!-- ===================== BATCHES ===================== -->
+  <div class="batches">
+
+    <!-- ══════════════════════════════════════════════════
+         BATCH 001 — WEEK OF JUNE 2, 2026
+         To add a new batch: copy from "BATCH START" to
+         "BATCH END" and paste above this one.
+         Update issue number, date, title, and roles.
+    ═══════════════════════════════════════════════════ -->
+
+    <!-- BATCH START -->
+    <div class="batch">
+      <div class="batch-header">
+        <div class="batch-meta">
+          <span class="batch-issue">/// Dispatch 001</span>
+          <div class="batch-title">Founders, Agents &amp; the Physical World</div>
+          <div class="batch-date">Week of June 2, 2026</div>
+        </div>
+        <div class="batch-count">1 opening</div>
+      </div>
+
+      <div class="roles-list">
+
+        <!-- ── ROLE CARD ── -->
+        <div class="role-card" id="role-001">
+          <div class="role-trigger" onclick="toggleRole('role-001')">
+            <div class="role-info">
+              <span class="role-company">Temper</span>
+              <div class="role-title">Founding Design Engineer</div>
+              <div class="role-pills">
+                <span class="pill">San Francisco · On-site</span>
+                <span class="pill">$150K–$250K + equity</span>
+                <span class="pill">Design Engineering</span>
+              </div>
+            </div>
+            <span class="role-arrow">›</span>
+          </div>
+
+          <div class="role-expanded">
+            <!-- JD -->
+            <div class="role-jd">
+              <p class="jd-pitch">First design hire at an AI-native system integrator replacing Infosys-style ERP consulting with intelligent agents. $8.3M raised. Paying enterprise customers. You design it, you ship it — React/TypeScript, no handoffs, direct to founders.</p>
+              <ul class="jd-bullets">
+                <li>Own the agentic interface, platform UX, and brand from scratch</li>
+                <li>Ship production frontend in React/TypeScript — design and code, not one or the other</li>
+                <li>Set the design language every future hire builds on</li>
+                <li>Work directly with CTO and co-founders, 5 days in-person SF</li>
+                <li>1–5 years experience in design engineering</li>
+              </ul>
+              <div class="comp-line">$150K–$250K base · 0.4–0.8% equity · Up to $300K for exceptional candidates</div>
+            </div>
+
+            <!-- FORM -->
+            <div class="role-form">
+              <div id="form-fields-001">
+                <div class="form-heading">Register your interest.</div>
+                <p class="form-sub">Ryan reaches out within 24hrs. No ATS. No black hole.</p>
+
+                <div class="field"><label>Full Name *</label><input type="text" id="001-name" placeholder="Your name"></div>
+                <div class="field"><label>Email *</label><input type="email" id="001-email" placeholder="you@example.com"></div>
+                <div class="field"><label>LinkedIn *</label><input type="url" id="001-linkedin" placeholder="linkedin.com/in/you"></div>
+                <div class="field"><label>Portfolio</label><input type="url" id="001-portfolio" placeholder="yoursite.com (optional)"></div>
+
+                <button class="submit-btn" onclick="submitInterest('001', 'Founding Design Engineer', 'Temper')">Register Interest →</button>
+                <p class="form-fine">Goes directly to Ryan at FRIPPN. Not a database.</p>
+              </div>
+              <div class="form-success" id="success-001">
+                <div class="success-mark">✦</div>
+                <h4>You're on the radar.</h4>
+                <p>Ryan will be in touch within 24 hours for a real conversation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ── END ROLE CARD ── -->
+
+      </div>
+    </div>
+    <!-- BATCH END -->
+
+  </div>
+  <!-- ===================== END BATCHES ===================== -->
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="sidebar-block">
+      <span class="sidebar-label">/// About FRIPPN</span>
+      <p><strong>FRIPPN</strong> is a boutique recruiting studio placing AI-fluent product designers and design engineers at frontier tech companies.</p>
+      <p>These aren't job listings. They're curated conversations. Every candidate goes through Ryan directly.</p>
+      <a href="mailto:ryan@frippn.com" class="cta-link">Talk to Ryan →</a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-block">
+      <span class="sidebar-label">/// Get the Dispatch</span>
+      <p>Weekly roles + signal from the frontier of AI + design. No noise.</p>
+      <div class="sub-form">
+        <input type="email" id="sub-email" placeholder="your@email.com">
+        <button class="sub-btn" onclick="handleSubscribe()">Subscribe →</button>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-block">
+      <span class="sidebar-label">/// Archive</span>
+      <div class="archive-list">
+        <a href="#" class="archive-item">
+          <span class="archive-item-title">Founders, Agents &amp; the Physical World</span>
+          <span class="archive-item-date">Jun 2</span>
+        </a>
+        <!-- Add archive items here as new batches publish -->
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  <a href="#" class="wordmark" style="font-size:14px;">
+    <span class="wordmark-dot"></span>
+    FRIPPN FRONTIERS
+  </a>
+  <p>Curated roles for designers building what's next.</p>
+  <p>© 2026 FRIPPN</p>
+</footer>
+
+<script>
+  // ── TOGGLE ROLE ──
+  function toggleRole(id) {
+    const card = document.getElementById(id);
+    const isOpen = card.classList.contains('expanded');
+    // Close all
+    document.querySelectorAll('.role-card.expanded').forEach(c => c.classList.remove('expanded'));
+    // Open clicked if it was closed
+    if (!isOpen) {
+      card.classList.add('expanded');
+      setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    }
+  }
+
+  // ── SUBMIT INTEREST ──
+  function submitInterest(id, roleTitle, company) {
+    const get = (field) => document.getElementById(`${id}-${field}`)?.value?.trim() || '';
+
+    const name      = get('name');
+    const email     = get('email');
+    const linkedin  = get('linkedin');
+    const portfolio = get('portfolio');
+
+    if (!name || !email || !linkedin) {
+      alert('Please fill in your name, email, and LinkedIn.');
+      return;
+    }
+
+    const subject = encodeURIComponent(`FRIPPN Interest: ${name} — ${roleTitle} at ${company}`);
+    const body = encodeURIComponent(
+`New interest submission
+
+Role: ${roleTitle} at ${company}
+
+Name: ${name}
+Email: ${email}
+LinkedIn: ${linkedin}
+Portfolio: ${portfolio || 'Not provided'}
+
+—
+Submitted via FRIPPN Frontiers`
+    );
+
+    // Show success
+    document.getElementById(`form-fields-${id}`).style.display = 'none';
+    document.getElementById(`success-${id}`).classList.add('show');
+
+    // Open mailto
+    setTimeout(() => {
+      window.location.href = `mailto:ryan@frippn.com?subject=${subject}&body=${body}`;
+    }, 500);
+  }
+
+  // ── SUBSCRIBE ──
+  function handleSubscribe() {
+    const email = document.getElementById('sub-email').value.trim();
+    if (!email) return;
+    // Opens mailto for now — swap for Beehiiv embed later
+    window.location.href = `mailto:ryan@frippn.com?subject=Subscribe me to FRIPPN Frontiers&body=Please add ${email} to the FRIPPN Frontiers dispatch.`;
+  }
+</script>
+
+</body>
+</html>
