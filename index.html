@@ -743,6 +743,7 @@
 
                 <div class="field"><label>Full Name *</label><input type="text" id="001-name" placeholder="Your name"></div>
                 <div class="field"><label>Email *</label><input type="email" id="001-email" placeholder="you@example.com"></div>
+                <div class="field"><label>Phone *</label><input type="tel" id="001-phone" placeholder="+1 (555) 000-0000"></div>
                 <div class="field"><label>LinkedIn *</label><input type="url" id="001-linkedin" placeholder="linkedin.com/in/you"></div>
                 <div class="field"><label>Portfolio</label><input type="url" id="001-portfolio" placeholder="yoursite.com (optional)"></div>
 
@@ -828,42 +829,41 @@
   }
 
   // ── SUBMIT INTEREST ──
-  function submitInterest(id, roleTitle, company) {
+  async function submitInterest(id, roleTitle, company) {
     const get = (field) => document.getElementById(`${id}-${field}`)?.value?.trim() || '';
 
     const name      = get('name');
     const email     = get('email');
+    const phone     = get('phone');
     const linkedin  = get('linkedin');
     const portfolio = get('portfolio');
 
-    if (!name || !email || !linkedin) {
-      alert('Please fill in your name, email, and LinkedIn.');
+    if (!name || !email || !phone || !linkedin) {
+      alert('Please fill in your name, email, phone, and LinkedIn.');
       return;
     }
 
-    const subject = encodeURIComponent(`FRIPPN Interest: ${name} — ${roleTitle} at ${company}`);
-    const body = encodeURIComponent(
-`New interest submission
+    const btn = document.querySelector(`#role-${id} .submit-btn`);
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
 
-Role: ${roleTitle} at ${company}
+    try {
+      const res = await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, linkedin, portfolio, role: roleTitle, company })
+      });
 
-Name: ${name}
-Email: ${email}
-LinkedIn: ${linkedin}
-Portfolio: ${portfolio || 'Not provided'}
+      if (!res.ok) throw new Error('Failed');
 
-—
-Submitted via FRIPPN Frontiers`
-    );
+      document.getElementById(`form-fields-${id}`).style.display = 'none';
+      document.getElementById(`success-${id}`).classList.add('show');
 
-    // Show success
-    document.getElementById(`form-fields-${id}`).style.display = 'none';
-    document.getElementById(`success-${id}`).classList.add('show');
-
-    // Open mailto
-    setTimeout(() => {
-      window.location.href = `mailto:ryan@frippn.com?subject=${subject}&body=${body}`;
-    }, 500);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Register Interest →';
+      alert('Something went wrong. Please email ryan@frippn.com directly.');
+    }
   }
 
   // ── SUBSCRIBE ──
