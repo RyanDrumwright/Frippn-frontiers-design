@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         from: 'onboarding@resend.dev',
-        to: 'ryan@frippn.com',
+        to: 'ryan.Drumwright@gmail.com',
         subject: `FRIPPN Interest: ${name} — ${role} at ${company}`,
         html: `
           <div style="font-family: monospace; max-width: 500px; padding: 24px; background: #0a0a0a; color: #f5f0e8; border-radius: 6px;">
